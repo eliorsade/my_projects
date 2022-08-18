@@ -1,5 +1,4 @@
 #!/user/bin/python3
-# python3 script
 
 import os
 mydir = "/home/slave/old_files"
