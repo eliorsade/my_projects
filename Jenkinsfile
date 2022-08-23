@@ -32,7 +32,7 @@ pipeline {
       stage('Push a docker image') {
          steps {
 			sh '''
-				docker tag mywebsite:${BUILD_NUMBER} ${REPO_NAME}/mywebsite:${BUILD_NUMBER}
+				docker tag mywebsite:${BUILD_NUMBER} ${REPO_NAME}/web-server:${BUILD_NUMBER}
 				docker push ${REPO_NAME}/web-server:${BUILD_NUMBER}
 			'''
          }
@@ -50,7 +50,7 @@ pipeline {
 					docker rm ${CONTAINER}
 				fi
 				echo "Running a new container"
-				docker run -d -p 80:80 ${REPO_NAME}/mywebsite:${BUILD_NUMBER}
+				docker run -d -p 80:80 ${REPO_NAME}/web-server:${BUILD_NUMBER}
 				echo "Check the URL: http://`hostname`:80"
 			'''
          }
