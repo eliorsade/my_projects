@@ -15,7 +15,6 @@ pipeline {
 	  stage('To update sources of the website') {
          steps {
 	 sh '''
-        cd docker
 	    echo "Input param ${NAME}"		
 	    echo "<p>Hello from ${NAME}!</p>" >> index.html
 	 '''
@@ -26,7 +25,6 @@ pipeline {
          steps {
             echo 'Build process..'            
             sh '''
-                cd docker
                 docker build -t="mywebsite:${BUILD_NUMBER}" .
             '''
          }
