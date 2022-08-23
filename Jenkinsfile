@@ -35,7 +35,7 @@ pipeline {
          steps {
 			sh '''
 				docker tag mywebsite:${BUILD_NUMBER} ${REPO_NAME}/mywebsite:${BUILD_NUMBER}
-				docker push ${REPO_NAME}/mywebsite:${BUILD_NUMBER}
+				docker push ${REPO_NAME}/web-server:${BUILD_NUMBER}
 			'''
          }
       }
