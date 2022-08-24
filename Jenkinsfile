@@ -1,151 +1,94 @@
-<?xml version='1.1' encoding='UTF-8'?>
-<flow-definition plugin="workflow-job@1207.ve6191ff089f8">
-  <actions>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@2.2114.v2654ca_721309"/>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@2.2114.v2654ca_721309">
-      <jobProperties/>
-      <triggers/>
-      <parameters>
-        <string>Language</string>
-      </parameters>
-      <options/>
-    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
-    <org.jenkinsci.plugins.workflow.multibranch.JobPropertyTrackerAction plugin="workflow-multibranch@716.vc692a_e52371b_">
-      <jobPropertyDescriptors>
-        <string>org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty</string>
-      </jobPropertyDescriptors>
-    </org.jenkinsci.plugins.workflow.multibranch.JobPropertyTrackerAction>
-  </actions>
-  <description>Jenkins Project</description>
-  <keepDependencies>false</keepDependencies>
-  <properties>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.34.5">
-      <projectUrl>https://github.com/eliorsade/my_projects.git/</projectUrl>
-      <displayName></displayName>
-    </com.coravy.hudson.plugins.github.GithubProjectProperty>
-    <hudson.model.ParametersDefinitionProperty>
-      <parameterDefinitions>
-        <hudson.model.ChoiceParameterDefinition>
-          <name>Language</name>
-          <description>Scriping languages</description>
-          <choices class="java.util.Arrays$ArrayList">
-            <a class="string-array">
-              <string>All</string>
-              <string>C</string>
-              <string>Python</string>
-              <string>Bash</string>
-            </a>
-          </choices>
-        </hudson.model.ChoiceParameterDefinition>
-      </parameterDefinitions>
-    </hudson.model.ParametersDefinitionProperty>
-    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
-      <triggers>
-        <hudson.triggers.SCMTrigger>
-          <spec>* * * * *</spec>
-          <ignorePostCommitHooks>false</ignorePostCommitHooks>
-        </hudson.triggers.SCMTrigger>
-      </triggers>
-    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
-  </properties>
-  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2759.v87459c4eea_ca_">
-    <script>pipeline {
+pipeline {
   agent any
   parameters {
     choice(
-      name: &apos;Language&apos;,
-      choices: [&apos;All&apos;, &apos;C&apos;, &apos;Python&apos;, &apos;Bash&apos;],
-      description: &apos;Scriping languages&apos;
+      name: 'Language',
+      choices: ['All', 'C', 'Python', 'Bash'],
+      description: 'Scriping languages'
     )
   }
   stages {
-    stage(&apos;GitHub&apos;) {
-            steps {
-                script {
-                    properties([pipelineTriggers([pollSCM(&apos;* * * * *&apos;)])])
-                }
-                git branch: &apos;Jenkins_Project&apos;, url: &apos;https://github.com/eliorsade/my_projects&apos;
-                sh &apos;&apos;&apos;
-                     echo ${WORKSPACE}
-                     ls -ltr
-                &apos;&apos;&apos;
-            }
-        }
-    stage(&apos;Print Language&apos;) {
+    stage('GitHub clone') {
+        steps {	  
+          checkout scm
+          sh 'ls -ltr'
+        } 
+      }
+    stage('Print Language') {
       steps {
           script{
-              if ( Language == &apos;All&apos; )
+              if ( Language == 'All' )
               {    
-                  echo &apos;You chose the execute all scripts (Python, Bash and C)&apos;
+                  echo 'You chose the execute all scripts (Python, Bash and C)'
               }
               else
               {
-                  echo &quot;The scripting language is ${params.Language}&quot;
+                  echo "The scripting language is ${params.Language}"
               }
           }
         
       }
     }
   
-    stage(&apos;log_files&apos;){
+    stage('log_files'){
         steps{
-          sh &apos;&apos;&apos;
-                  mkdir -p &quot;${WORKSPACE}/logs&quot;
-                  results_file=&quot;${WORKSPACE}/logs/results.txt&quot;
+          sh '''
+                  mkdir -p "${WORKSPACE}/logs"
+                  results_file="${WORKSPACE}/logs/results.txt"
                   
-                  if [ -f &quot;${results_file}&quot; ]; then
-                        echo &quot;file ${results_file} exists&quot;
+                  if [ -f "${results_file}" ]; then
+                        echo "file ${results_file} exists"
                   else
 	                     touch ${results_file}
                         fi
-                        chmod a+rwx &quot;${WORKSPACE}/logs/results.txt&quot;
+                        chmod a+rwx "${WORKSPACE}/logs/results.txt"
                         
-              &apos;&apos;&apos;
-              sh &apos;true &gt; ${WORKSPACE}/logs/results.txt&apos;
+              '''
+              sh 'true > ${WORKSPACE}/logs/results.txt'
              
         }
     }
 
 
-    stage(&apos;Python&apos;) {
-        when { expression { Language == &apos;Python&apos; || Language == &apos;All&apos; } }
+    stage('Python') {
+        when { expression { Language == 'Python' || Language == 'All' } }
             steps {
                 retry(3) {
-                sh &apos;&apos;&apos;
+                sh '''
                     chmod +x ${WORKSPACE}/delete_files_python.py
                     python3 -u delete_files_python.py
-                    echo &apos;Python scripts was successful&apos; &gt;&gt; &quot;${WORKSPACE}/logs/results.txt&quot;
-               &apos;&apos;&apos;
+                    echo 'Python scripts was successful' >> "${WORKSPACE}/logs/results.txt"
+               '''
             }
             }
 }
 
-    stage(&apos;Bash&apos;) {
-        when { expression { Language == &apos;Bash&apos; || Language == &apos;All&apos; } }
+    stage('Bash') {
+        when { expression { Language == 'Bash' || Language == 'All' } }
             steps {
                 retry(3) {
-                sh &apos;&apos;&apos;
+                sh '''
                 chmod +x ${WORKSPACE}/create-files.sh
                 ./create-files.sh
-                echo &apos;Bash scripts was successful&apos; &gt;&gt; &quot;${WORKSPACE}/logs/results.txt&quot;
-                echo &apos;Bash scripts was successful&apos;
-                &apos;&apos;&apos;
- //               description: &apos;Creates files in old files folder&apos;
+                echo 'Bash scripts was successful' >> "${WORKSPACE}/logs/results.txt"
+                echo 'Bash scripts was successful'
+                '''
+ //               description: 'Creates files in old files folder'
 
             }
             }
 }
     
-        stage(&apos;C&apos;) {
-        when { expression { Language == &apos;C&apos; || Language == &apos;All&apos; } }
+        stage('C') {
+        when { expression { Language == 'C' || Language == 'All' } }
             steps {
                 retry(3) {
-                sh &apos;&apos;&apos;
+                sh '''
                 chmod +xrw ${WORKSPACE}/c_script_test
                 ./c_script_test
-                echo &apos;C scripts was successful&apos; &gt;&gt; &quot;${WORKSPACE}/logs/results.txt&quot;
-                echo &apos;C scripts was successful&apos;
-                &apos;&apos;&apos;
+                echo 'C scripts was successful' >> "${WORKSPACE}/logs/results.txt"
+                echo 'C scripts was successful'
+                '''
                 
             }
 }
@@ -154,41 +97,36 @@
 
 
 
-        stage(&apos;Saving Results&apos;) {
+        stage('Saving Results') {
           steps {
-              sh &apos;&apos;&apos;
-            echo &apos;Cleaning files&apos;
+              sh '''
+            echo 'Cleaning files'
             rm ${WORKSPACE}/delete_files_python.py*
             rm ${WORKSPACE}/c_script_test*
             rm ${WORKSPACE}/create-files.sh*
             rm ${WORKSPACE}/README.md
-            echo &apos;Saving Results process..&apos;
-          report_file=&quot;${WORKSPACE}/logs/report.txt&quot;
-	      date &gt;&gt; ${report_file}
-	      echo &quot;USER=$USER JOB_NAME=$JOB_NAME&quot; &gt;&gt; ${report_file}
-          echo &quot;Build Number $BUILD_NUMBER&quot; &gt;&gt; ${report_file}
-          cat &quot;${WORKSPACE}/logs/results.txt&quot; &gt;&gt; ${report_file}
-	      echo &quot;#############################&quot; &gt;&gt; ${report_file}
-            &apos;&apos;&apos;
+            rm ${WORKSPACE}/Jenkinsfile
+            echo 'Saving Results process..'
+          report_file="${WORKSPACE}/logs/report.txt"
+	      date >> ${report_file}
+	      echo "USER=$USER JOB_NAME=$JOB_NAME" >> ${report_file}
+          echo "Build Number $BUILD_NUMBER" >> ${report_file}
+          cat "${WORKSPACE}/logs/results.txt" >> ${report_file}
+	      echo "#############################" >> ${report_file}
+            '''
          }
       }
 }
 post {
 
         success {
-            echo &apos;Successfully done&apos;
+            echo 'Successfully done'
         }
         failure {
-            echo &apos;Failure in running this job&apos;
+            echo 'Failure in running this job'
         }
     
   }
 
 
 }
-</script>
-    <sandbox>true</sandbox>
-  </definition>
-  <triggers/>
-  <disabled>false</disabled>
-</flow-definition>
