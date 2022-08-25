@@ -1,1 +1,3 @@
+FROM eliorsade/web-server-non-m1:latest
 
+COPY ./html/* /var/www/html/
