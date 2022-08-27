@@ -25,7 +25,7 @@ pipeline {
          steps {
             echo 'Build process..'            
             sh '''
-                docker build -t="mywebsite:${BUILD_NUMBER}" -f Dockerfile-non-m1
+                docker build -t="mywebsite:${BUILD_NUMBER}" -f Dockerfile-non-m1 .
             '''
          }
       }
