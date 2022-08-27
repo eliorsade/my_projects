@@ -1,6 +1,6 @@
 FROM eliorsade/webserver-non-mac:1.0.1
 CMD mkdir /var/www/webosmaster
-chmod -R 755 /var/www/webosmaster
+CMD chmod -R 755 /var/www/webosmaster
 COPY ./webosmaster.ga /var/www/webosmaster
 CMD a2ensite webosmaster.conf
 CMD a2dissite 000-default.conf
