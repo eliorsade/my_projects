@@ -12,14 +12,7 @@ pipeline {
             sh 'printenv'
          }
       }
-	  stage('To update sources of the website') {
-         steps {
-	 sh '''
-	    echo "Input param ${NAME}"		
-	    echo "<p>Hello from ${NAME}!</p>" >> index.html
-	 '''
-         }
-      }
+	  
 	  
       stage('Build a docker image') {
          steps {
@@ -32,8 +25,8 @@ pipeline {
       stage('Push a docker image') {
          steps {
 			sh '''
-				docker tag mywebsite:${BUILD_NUMBER} ${REPO_NAME}/web-server:${BUILD_NUMBER}
-				docker push ${REPO_NAME}/web-server:${BUILD_NUMBER}
+				docker tag mywebsite:${BUILD_NUMBER} ${REPO_NAME}/webserver-non-mac:${BUILD_NUMBER}
+				docker push ${REPO_NAME}/webserver-non-mac:${BUILD_NUMBER}
 			'''
          }
       }
@@ -50,7 +43,7 @@ pipeline {
 					docker rm ${CONTAINER}
 				fi
 				echo "Running a new container"
-				docker run -d -p 80:80 ${REPO_NAME}/web-server:${BUILD_NUMBER}
+				docker run -d -p 80:80 ${REPO_NAME}/webserver-non-mac:${BUILD_NUMBER}
 				echo "Check the URL: http://`hostname`:80"
 			'''
          }
