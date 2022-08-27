@@ -1,5 +1,3 @@
 FROM eliorsade/webserver-non-mac:1.0.1
-CMD mkdir /var/www/webosmaster.ga
-CMD chmod -R 755 /var/www/webosmaster.ga
-COPY webosmaster.ga.conf /etc/apache2/sites-available/
-COPY ./html/ /var/www/webosmaster.ga/
+
+COPY ./html /var/www/html
