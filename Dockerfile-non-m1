@@ -5,4 +5,5 @@ COPY ./html /var/www/webosmaster
 CMD a2ensite webosmaster.conf
 CMD a2dissite 000-default.conf
 CMD service apache2 reload
+CMD service apache2 start
 COPY ./html/ /var/www/webosmaster.ga/
