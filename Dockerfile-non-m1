@@ -1,7 +1,7 @@
 FROM eliorsade/webserver-non-mac:1.0.1
 CMD mkdir /var/www/webosmaster.ga
 CMD chmod -R 755 /var/www/webosmaster.ga
-COPY .webosmaster.ga.conf /etc/apache2/sites-available/
+COPY webosmaster.ga.conf /etc/apache2/sites-available/
 CMD a2ensite webosmaster.conf
 CMD a2dissite 000-default.conf
 CMD service apache2 reload
